@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Explainer - Self-Learning AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        .teach-modal {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    
+    <!-- Header -->
+    <nav class="bg-black/50 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-robot text-purple-400 text-2xl"></i>
+                    <h1 class="text-xl font-bold text-white">Workflow Explainer</h1>
+                    <span class="ml-2 px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full">Self-Learning</span>
+                </div>
+                <div class="text-sm text-gray-400">
+                    <i class="fas fa-graduation-cap mr-1"></i> Teaches itself from you
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Hero Section -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                Understand Any Workflow in <span class="text-purple-400">Seconds</span>
+            </h2>
+            <p class="text-gray-300 text-lg max-w-2xl mx-auto">
+                Paste your n8n JSON. The AI explains what it does, identifies risks, and <span class="text-purple-300">learns from you</span> when it doesn't know something.
+            </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            
+            <!-- LEFT COLUMN: Input -->
+            <div class="space-y-4">
+                
+                <!-- Workflow Input Card -->
+                <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-white">
+                            <i class="fas fa-code mr-2 text-purple-400"></i>Workflow JSON
+                        </h3>
+                        <div class="flex gap-2">
+                            <button id="sampleBtn" class="text-xs px-3 py-1 bg-white/10 hover:bg-white/20 rounded-lg transition text-gray-300">
+                                <i class="fas fa-file-alt mr-1"></i>Load Sample
+                            </button>
+                            <label class="text-xs px-3 py-1 bg-white/10 hover:bg-white/20 rounded-lg transition text-gray-300 cursor-pointer">
+                                <i class="fas fa-upload mr-1"></i>Upload File
+                                <input type="file" id="fileUpload" accept=".json" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <textarea id="workflowJson" 
+                        class="w-full h-80 bg-black/50 border border-white/20 rounded-lg p-4 text-gray-200 font-mono text-sm focus:outline-none focus:border-purple-500 transition"
+                        placeholder='Paste your n8n workflow JSON here...'></textarea>
+                    
+                    <div class="mt-4 flex gap-3">
+                        <button id="analyzeBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-magic"></i> Analyze Workflow
+                        </button>
+                        <button id="clearBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-gray-300">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Questions Card -->
+                <div class="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
+                    <h3 class="text-md font-semibold text-white mb-3">
+                        <i class="fas fa-question-circle mr-2 text-purple-400"></i>Quick Questions
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">What does it do?</button>
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">Why was this built?</button>
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">What are the risks?</button>
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">Health score?</button>
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">Can I delete it?</button>
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">What breaks if disabled?</button>
+                        <button class="quick-question text-sm px-3 py-1.5 bg-white/10 hover:bg-purple-600/50 rounded-full transition text-gray-300">Who owns it?</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Output -->
+            <div class="space-y-4">
+                
+                <!-- Analysis Results -->
+                <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-chart-line mr-2 text-purple-400"></i>Analysis
+                    </h3>
+                    
+                    <div id="resultsArea">
+                        <div id="loadingState" class="hidden text-center py-8">
+                            <div class="inline-block">
+                                <i class="fas fa-spinner fa-pulse text-purple-400 text-3xl mb-3"></i>
+                                <p class="text-gray-300">Analyzing workflow<span class="loading-dots"></span></p>
+                            </div>
+                        </div>
+                        
+                        <div id="resultsContent">
+                            <div class="text-center text-gray-400 py-8">
+                                <i class="fas fa-cloud-upload-alt text-4xl mb-3 opacity-50"></i>
+                                <p>Paste a workflow JSON and click Analyze</p>
+                                <p class="text-sm mt-2">Or click "Load Sample" to see a demo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q&A Chat -->
+                <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-comments mr-2 text-purple-400"></i>Ask Anything
+                    </h3>
+                    
+                    <div id="chatHistory" class="h-48 overflow-y-auto mb-4 space-y-2 text-sm">
+                        <div class="text-center text-gray-500 text-xs py-4">
+                            Ask a question about this workflow
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="chatInput" placeholder="e.g., What happens if Slack fails?" 
+                            class="flex-1 bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-gray-200 focus:outline-none focus:border-purple-500">
+                        <button id="askBtn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition text-white">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feedback Section -->
+                <div class="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
+                    <h3 class="text-md font-semibold text-white mb-3">
+                        <i class="fas fa-star mr-2 text-yellow-400"></i>Help Improve This Tool
+                    </h3>
+                    <textarea id="feedbackInput" rows="2" 
+                        class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-gray-200 text-sm focus:outline-none focus:border-purple-500"
+                        placeholder="What would make this useful for you? What's missing?"></textarea>
+                    <div class="flex gap-3 mt-3">
+                        <input type="email" id="feedbackEmail" placeholder="Your email (optional)" 
+                            class="flex-1 bg-black/50 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-gray-200 focus:outline-none focus:border-purple-500">
+                        <button id="submitFeedbackBtn" class="px-4 py-1.5 bg-green-600/70 hover:bg-green-600 rounded-lg transition text-white text-sm">
+                            Submit Feedback
+                        </button>
+                    </div>
+                    <p id="feedbackStatus" class="text-xs text-gray-400 mt-2 hidden"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teach Modal (Hidden by default) -->
+    <div id="teachModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-slate-800 rounded-xl border border-purple-500/30 max-w-md w-full mx-4 p-6 teach-modal">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-white">
+                    <i class="fas fa-graduation-cap mr-2 text-purple-400"></i>Teach the AI
+                </h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <p class="text-gray-300 text-sm mb-4">
+                I don't recognize <span id="unknownNodeName" class="text-purple-400 font-mono"></span>. Help me learn!
+            </p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">What app/service is this?</label>
+                    <input type="text" id="teachAppName" placeholder="e.g., Stripe, Salesforce, Monday.com" 
+                        class="w-full bg-black/50 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">What does this node do?</label>
+                    <input type="text" id="teachPurpose" placeholder="e.g., Creates payment intent, Sends email" 
+                        class="w-full bg-black/50 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <button id="submitTeachBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition">
+                    <i class="fas fa-save mr-2"></i>Teach & Re-analyze
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = "http://127.0.0.1:8000";
+        
+        // State
+        let currentWorkflowJson = null;
+        let currentWorkflowId = null;
+        let currentUnknownNodes = [];
+        let teachingNode = null;
+        
+        // DOM Elements
+        const workflowJsonTextarea = document.getElementById('workflowJson');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sampleBtn = document.getElementById('sampleBtn');
+        const fileUpload = document.getElementById('fileUpload');
+        const resultsContent = document.getElementById('resultsContent');
+        const loadingState = document.getElementById('loadingState');
+        const chatInput = document.getElementById('chatInput');
+        const askBtn = document.getElementById('askBtn');
+        const chatHistoryDiv = document.getElementById('chatHistory');
+        const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+        const feedbackInput = document.getElementById('feedbackInput');
+        const feedbackEmail = document.getElementById('feedbackEmail');
+        const feedbackStatus = document.getElementById('feedbackStatus');
+        
+        // Modal elements
+        const teachModal = document.getElementById('teachModal');
+        const unknownNodeName = document.getElementById('unknownNodeName');
+        const teachAppName = document.getElementById('teachAppName');
+        const teachPurpose = document.getElementById('teachPurpose');
+        const submitTeachBtn = document.getElementById('submitTeachBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        // Sample workflow (the hospital M&A workflow)
+        const sampleWorkflow = {
+            "name": "Pediatric Hospital M&A Chat Agent",
+            "business_purpose": "Automated buyer matching for hospital acquisition leads - saves 20 hours/week of manual matching",
+            "business_impact": "Critical - handles all inbound acquisition leads",
+            "owner": "M&A Team",
+            "created_at": "2024-01-15",
+            "nodes": [
+                {"name": "Webhook", "type": "n8n-nodes-base.webhook", "parameters": {"path": "/inbound-lead"}},
+                {"name": "Search Airtable", "type": "n8n-nodes-base.airtable", "parameters": {"table": "BuyerDB"}},
+                {"name": "Check Exists", "type": "n8n-nodes-base.if"},
+                {"name": "Send WhatsApp", "type": "n8n-nodes-base.whatsApp", "parameters": {}},
+                {"name": "Log to Sheets", "type": "n8n-nodes-base.googleSheets", "parameters": {}}
+            ]
+        };
+        
+        // Display results with teaching buttons
+        function displayResults(data) {
+            let unknownNodesHtml = '';
+            if (data.unknown_nodes && data.unknown_nodes.length > 0) {
+                currentUnknownNodes = data.unknown_nodes;
+                unknownNodesHtml = `
+                    <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mt-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-graduation-cap text-yellow-400"></i>
+                            <span class="text-yellow-300 text-sm font-semibold">I don't recognize these nodes</span>
+                        </div>
+                        <div class="space-y-2">
+                            ${data.unknown_nodes.map(node => `
+                                <div class="flex justify-between items-center bg-black/30 rounded-lg p-2">
+                                    <div>
+                                        <span class="text-gray-300 text-sm font-mono">${node.name}</span>
+                                        <span class="text-gray-500 text-xs ml-2">${node.type.split('.').pop()}</span>
+                                    </div>
+                                    <button onclick="openTeachModal('${node.id}', '${node.name.replace(/'/g, "\\'")}')" 
+                                        class="text-xs px-3 py-1 bg-yellow-600/50 hover:bg-yellow-600 rounded-lg transition text-white">
+                                        <i class="fas fa-chalkboard-user mr-1"></i>Teach me
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            let html = `
+                <div class="space-y-4">
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-file-alt text-purple-400"></i>
+                            <span class="font-semibold text-white">Workflow: ${data.name || 'Unnamed'}</span>
+                        </div>
+                        <p class="text-gray-300 text-sm">${data.summary || 'No summary generated'}</p>
+                        ${unknownNodesHtml}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-xs text-gray-400 mb-1"><i class="fas fa-plug mr-1"></i>Trigger</div>
+                            <div class="text-white text-sm">${data.trigger || 'Unknown'}</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-xs text-gray-400 mb-1"><i class="fas fa-chart-line mr-1"></i>Health Score</div>
+                            <div class="text-white text-sm ${data.health_score < 70 ? 'text-yellow-400' : 'text-green-400'}">${data.health_score || 'N/A'}/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <div class="text-xs text-gray-400 mb-2"><i class="fas fa-cube mr-1"></i>Actions</div>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.actions && data.actions.length ? data.actions.map(a => `<span class="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full">${a}</span>`).join('') : '<span class="text-gray-500 text-sm">None detected</span>'}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <div class="text-xs text-gray-400 mb-2"><i class="fas fa-exclamation-triangle mr-1"></i>Risks</div>
+                        <ul class="space-y-1">
+                            ${data.risks && data.risks.length ? data.risks.map(r => `<li class="text-yellow-300/80 text-xs">⚠️ ${r}</li>`).join('') : '<li class="text-gray-500 text-sm">No risks detected</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <div class="text-xs text-gray-400 mb-2"><i class="fas fa-tag mr-1"></i>Dependencies</div>
+                        <div class="flex flex-wrap gap-1">
+                            ${data.dependencies && data.dependencies.length ? data.dependencies.map(d => `<span class="text-xs px-2 py-0.5 bg-white/10 text-gray-300 rounded-full">${d}</span>`).join('') : '<span class="text-gray-500 text-sm">None</span>'}
+                        </div>
+                    </div>
+                    
+                    ${data.missing_docs && data.missing_docs.length ? `
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                        <div class="text-xs text-gray-400 mb-2"><i class="fas fa-file-excel mr-1"></i>Missing Documentation</div>
+                        <ul class="space-y-1">
+                            ${data.missing_docs.map(m => `<li class="text-red-300/80 text-xs">📝 ${m}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            resultsContent.innerHTML = html;
+            currentWorkflowJson = data;
+        }
+        
+        // Open teaching modal
+        window.openTeachModal = function(nodeId, nodeName) {
+            teachingNode = { id: nodeId, name: nodeName };
+            unknownNodeName.textContent = nodeName;
+            teachAppName.value = '';
+            teachPurpose.value = '';
+            teachModal.classList.remove('hidden');
+        };
+        
+        function closeModal() {
+            teachModal.classList.add('hidden');
+            teachingNode = null;
+        }
+        
+        // Submit teaching
+        async function submitTeaching() {
+            if (!teachingNode) return;
+            
+            const appName = teachAppName.value.trim();
+            const purpose = teachPurpose.value.trim();
+            
+            if (!appName) {
+                alert("Please tell me what app/service this is");
+                return;
+            }
+            
+            showFeedbackStatus("Teaching AI... Please wait", "info");
+            
+            try {
+                const response = await fetch(`${API_URL}/teach`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        node_id: teachingNode.id,
+                        node_name: teachingNode.name,
+                        app_name: appName,
+                        purpose: purpose || "No description provided",
+                        workflow_id: currentWorkflowId || "unknown"
+                    })
+                });
+                
+                if (response.ok) {
+                    showFeedbackStatus(`Thanks! I'll remember that ${teachingNode.name} is ${appName}. Re-analyzing...`, "success");
+                    closeModal();
+                    
+                    // Re-analyze with new knowledge
+                    const jsonText = workflowJsonTextarea.value;
+                    if (jsonText) {
+                        try {
+                            const parsed = JSON.parse(jsonText);
+                            await analyzeWorkflow(parsed);
+                        } catch(e) {
+                            console.error("Re-analyze failed", e);
+                        }
+                    }
+                } else {
+                    throw new Error("Failed to teach");
+                }
+            } catch (error) {
+                console.error("Teaching error:", error);
+                showFeedbackStatus("Failed to teach AI. Please try again.", "error");
+            }
+        }
+        
+        async function analyzeWorkflow(workflowJson) {
+            loadingState.classList.remove('hidden');
+            resultsContent.classList.add('hidden');
+            
+            try {
+                const payload = {
+                    workflow: typeof workflowJson === 'string' ? JSON.parse(workflowJson) : workflowJson,
+                    question: "what does it do?"
+                };
+                
+                currentWorkflowId = payload.workflow.id || payload.workflow.name || Date.now().toString();
+                
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayResults(data);
+                
+                // Reset chat
+                chatHistoryDiv.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">Ask a question about this workflow</div>';
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                resultsContent.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-circle text-red-400 text-4xl mb-3"></i>
+                        <p class="text-red-300">Error analyzing workflow</p>
+                        <p class="text-gray-400 text-sm mt-2">${error.message}</p>
+                        <p class="text-gray-500 text-xs mt-4">Make sure the backend is running on ${API_URL}</p>
+                    </div>
+                `;
+            } finally {
+                loadingState.classList.add('hidden');
+                resultsContent.classList.remove('hidden');
+            }
+        }
+        
+        async function askQuestion(question) {
+            if (!question.trim()) return;
+            
+            addChatMessage(question, "user");
+            chatInput.value = "";
+            
+            try {
+                const jsonText = workflowJsonTextarea.value;
+                if (!jsonText) {
+                    addChatMessage("Please load a workflow first", "bot");
+                    return;
+                }
+                
+                const workflowData = JSON.parse(jsonText);
+                
+                const response = await fetch(`${API_URL}/ask`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        workflow: workflowData,
+                        question: question
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to get answer');
+                
+                const data = await response.json();
+                addChatMessage(data.answer, "bot");
+                
+                // If AI needs teaching, suggest it
+                if (data.needs_teaching && currentUnknownNodes.length > 0) {
+                    addChatMessage("💡 I don't fully understand this workflow. Click 'Teach me' on unknown nodes to help me learn.", "bot");
+                }
+                
+            } catch (error) {
+                console.error('Q&A error:', error);
+                addChatMessage(`Error: ${error.message}. Make sure the backend is running.`, "bot");
+            }
+        }
+        
+        function addChatMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            messageDiv.innerHTML = `
+                <div class="max-w-[80%] ${sender === 'user' ? 'bg-purple-600' : 'bg-white/10'} rounded-lg px-3 py-2 text-sm">
+                    ${message}
+                </div>
+            `;
+            
+            if (chatHistoryDiv.children.length === 1 && chatHistoryDiv.children[0].innerText.includes('Ask a question')) {
+                chatHistoryDiv.innerHTML = '';
+            }
+            
+            chatHistoryDiv.appendChild(messageDiv);
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+        }
+        
+        async function submitFeedback() {
+            const feedback = feedbackInput.value.trim();
+            if (!feedback) {
+                showFeedbackStatus("Please enter feedback", "error");
+                return;
+            }
+            
+            const email = feedbackEmail.value.trim();
+            
+            try {
+                const response = await fetch(`${API_URL}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        feedback: feedback,
+                        email: email,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (response.ok) {
+                    showFeedbackStatus("Thank you! Your feedback helps improve this tool.", "success");
+                    feedbackInput.value = "";
+                    feedbackEmail.value = "";
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                // Fallback: save locally
+                const localFeedback = JSON.parse(localStorage.getItem('feedback') || '[]');
+                localFeedback.push({ feedback, email, timestamp: new Date().toISOString() });
+                localStorage.setItem('feedback', JSON.stringify(localFeedback));
+                showFeedbackStatus("Feedback saved locally. Thanks!", "success");
+                feedbackInput.value = "";
+            }
+            
+            setTimeout(() => {
+                feedbackStatus.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function showFeedbackStatus(message, type) {
+            feedbackStatus.textContent = message;
+            feedbackStatus.className = `text-xs mt-2 ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400'}`;
+            feedbackStatus.classList.remove('hidden');
+        }
+        
+        function loadSample() {
+            workflowJsonTextarea.value = JSON.stringify(sampleWorkflow, null, 2);
+            analyzeWorkflow(sampleWorkflow);
+        }
+        
+        // Event Listeners
+        analyzeBtn.addEventListener('click', () => {
+            const jsonText = workflowJsonTextarea.value.trim();
+            if (!jsonText) {
+                alert('Please paste a workflow JSON first');
+                return;
+            }
+            
+            try {
+                const parsed = JSON.parse(jsonText);
+                analyzeWorkflow(parsed);
+            } catch (e) {
+                alert('Invalid JSON. Please check your format.');
+            }
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            workflowJsonTextarea.value = '';
+            resultsContent.innerHTML = `
+                <div class="text-center text-gray-400 py-8">
+                    <i class="fas fa-cloud-upload-alt text-4xl mb-3 opacity-50"></i>
+                    <p>Paste a workflow JSON and click Analyze</p>
+                </div>
+            `;
+            chatHistoryDiv.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">Ask a question about this workflow</div>';
+            currentUnknownNodes = [];
+        });
+        
+        sampleBtn.addEventListener('click', loadSample);
+        askBtn.addEventListener('click', () => askQuestion(chatInput.value));
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askQuestion(chatInput.value);
+        });
+        submitFeedbackBtn.addEventListener('click', submitFeedback);
+        submitTeachBtn.addEventListener('click', submitTeaching);
+        closeModalBtn.addEventListener('click', closeModal);
+        
+        // Quick question buttons
+        document.querySelectorAll('.quick-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.textContent;
+                if (question) askQuestion(question);
+            });
+        });
+        
+        fileUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    workflowJsonTextarea.value = event.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        // Auto-load sample on first visit
+        if (workflowJsonTextarea.value === '') {
+            loadSample();
+        }
+        
+        console.log('Workflow Explainer Self-Learning UI Ready');
+        console.log(`Backend API: ${API_URL}`);
+    </script>
+</body>
+</html>
